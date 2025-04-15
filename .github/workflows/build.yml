@@ -1,8 +1,10 @@
 name: Build Watchtower Custom
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build-and-push:
@@ -17,7 +19,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: tuusuario/watchtower-custom:latest
+        tags: raptor057/watchtower-custom:latest
         build-args: |
           SMTP_USER=${{ secrets.SMTP_USER }}
           SMTP_PASS=${{ secrets.SMTP_PASS }}
