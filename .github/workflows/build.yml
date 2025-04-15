@@ -1,4 +1,4 @@
-name: Build Watchtower Custom
+name: Build and Push Watchtower Custom to GHCR
 
 on:
   workflow_dispatch:
@@ -10,22 +10,36 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
+    permissions:
+      packages: write
+      contents: read
+
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
-    - name: Login to Docker Hub
+    - name: Login to GHCR
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GHCR_PAT }}
 
-    - name: Build and Push Docker Image
+    - name: Set up Docker Metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository_owner }}/watchtower-custom
+        tags: |
+          type=raw,value=latest
+
+    - name: Build & Push Image to GHCR
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: raptor057/watchtower-custom:latest
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
         build-args: |
           SMTP_USER=${{ secrets.SMTP_USER }}
           SMTP_PASS=${{ secrets.SMTP_PASS }}
