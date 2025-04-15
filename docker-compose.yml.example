@@ -1,0 +1,9 @@
+services:
+  watchtower:
+    image: tuusuario/watchtower-custom:latest
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_NOTIFICATION_EMAIL_TO=${EMAIL_TO}  # libre y configurable por el usuario
